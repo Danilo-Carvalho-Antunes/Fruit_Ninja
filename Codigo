@@ -30,15 +30,15 @@ class Fruta:
     def __init__(
         self, x, y, radius, vx , vy, color=pyxel.COLOR_BROWN, life=float("inf")
     ):
-        self.x = x #posição do 
-        self.y = y
-        self.radius = radius
-        self.color = color
-        self.life = life
-        self.vx = vx
-        self.vy = vy
+        self.x = x #posição em x 
+        self.y = y #posição em y
+        self.radius = radius # raio
+        self.color = color #cor do circulo
+        self.life = life #tempo de vida na tela
+        self.vx = vx #velocidade em x
+        self.vy = vy #velocidade em y
 
-    def clic(self, x, y, radius):
+    def clic(self, x, y, radius): #funçao que reconhece o clic
         if pyxel.btnp(pyxel.MOUSE_LEFT_BUTTON):
             dx = pyxel.mouse_x - x
             dy = pyxel.mouse_y - y
@@ -50,15 +50,15 @@ class Fruta:
         if self.x == 0:
             self.color = pyxel.frame_count % 16
 
-    def fall(self):
+    def fall(self): #função que faz a bolinha cair
         self.x += self.vx 
         self.y += self.vy 
         self.vy += gravity
 
-    def draw(self):
+    def draw(self): #função de desenhar 
         pyxel.circ (self.x, self.y, self.radius, self.color)
 
-def update():
+def update(): #função que atualiza o circulo durante o jogo
     if pyxel.btnp(pyxel.KEY_Q):
         pyxel.quit()
     for circ in circ_list.copy():
@@ -70,12 +70,12 @@ def update():
             circ.fall()
     
 
-    # Cria um fruta novo a cada 15 frames e adiciona na lista
+    # Cria um fruta novo a cada x frames e adiciona na lista
     if pyxel.frame_count % 8 == 0 and len(circ_list) < 100:
         circ = random_circ()
         circ_list.append(circ)
 
-def random_circ():
+def random_circ(): #função que cria varios circulos
     global radius
     color = random.choice(cores)
     x = random.uniform(0, 160)
@@ -86,7 +86,7 @@ def random_circ():
     return Fruta(x, y,radius = radius ,vx = vx , vy = vy,color= color , life=110)
 
 
-def draw():
+def draw(): # desenha mapa e circulos
     pyxel.cls(5)
     pyxel.bltm(15, 0, 0, 0, 0, 20, 16, pyxel.COLOR_CYAN)
     for circ in circ_list:
