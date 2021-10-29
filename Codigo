@@ -4,6 +4,7 @@ from math import sqrt
 
 gravity = 5 / 60 #gravidade com que o circulo cai 
 lose = False
+score = 0 
 
 cores = [
     0,
@@ -40,15 +41,16 @@ class Fruta:
         self.vy = vy #velocidade em y
 
     def clic(self): #funçao que reconhece o clic
-        global lose
+        global lose , score
         dx = pyxel.mouse_x - self.x
         dy = pyxel.mouse_y - self.y
         if sqrt(dx ** 2 + dy ** 2) < self.radius:
             self.life = 0
             if self.color == 0:
                 lose = True
-                if pyxel.mouse_x == (55,65) and pyxel.mouse_y == (75,85):
-                    pyxel.run(update,draw)
+            else:
+                score += 1
+        
                 
 
     def fall(self): #função que faz a bolinha cair
@@ -76,6 +78,7 @@ def update(): #função que atualiza o circulo durante o jogo
             del circ_list[i]
         else :
             circ.fall() 
+    
 
     # Cria um circulo novo a cada x frames e adiciona na lista
     if pyxel.frame_count % 16 == 0 and len(circ_list) < 100:
@@ -98,8 +101,11 @@ def draw(): # desenha mapa e circulos
     pyxel.bltm(15, 0, 0, 0, 0, 20, 16, pyxel.COLOR_CYAN)
     for circ in circ_list:
         circ.draw()
+    pyxel.text (63 , 26 , "SCORE:" ,1)
+    pyxel.text(86 , 26 ,str(score),7)
     if lose == True:
         game_over()
+    
         
 def game_over():
     pyxel.cls(5)
