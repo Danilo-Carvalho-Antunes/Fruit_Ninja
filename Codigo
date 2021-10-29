@@ -2,10 +2,11 @@ import pyxel
 import random
 from math import sqrt
 
-radius = 8 #raio do circulo 
 gravity = 5 / 60 #gravidade com que o circulo cai 
+lose = False
 
 cores = [
+    0,
     0,
     0,
     0,
@@ -28,7 +29,7 @@ cores = [
 
 class Fruta:
     def __init__(
-        self, x, y, radius, vx , vy, color=pyxel.COLOR_BROWN, life=float("inf")
+        self, x, y, radius, vx , vy, color, life= float("inf")
     ):
         self.x = x #posição em x 
         self.y = y #posição em y
@@ -38,17 +39,17 @@ class Fruta:
         self.vx = vx #velocidade em x
         self.vy = vy #velocidade em y
 
-    def clic(self, x, y, radius): #funçao que reconhece o clic
-        if pyxel.btnp(pyxel.MOUSE_LEFT_BUTTON):
-            dx = pyxel.mouse_x - x
-            dy = pyxel.mouse_y - y
-            if sqrt(dx ** 2 + dy ** 2) < radius:
-                self.vx = 0
-                self.vy = 0
-        self.x += self.vx
-        self.y += self.vy
-        if self.x == 0:
-            self.color = pyxel.frame_count % 16
+    def clic(self): #funçao que reconhece o clic
+        global lose
+        dx = pyxel.mouse_x - self.x
+        dy = pyxel.mouse_y - self.y
+        if sqrt(dx ** 2 + dy ** 2) < self.radius:
+            self.life = 0
+            if self.color == 0:
+                lose = True
+                if pyxel.mouse_x == (55,65) and pyxel.mouse_y == (75,85):
+                    pyxel.run(update,draw)
+                
 
     def fall(self): #função que faz a bolinha cair
         self.x += self.vx 
@@ -56,22 +57,28 @@ class Fruta:
         self.vy += gravity
 
     def draw(self): #função de desenhar 
-        pyxel.circ (self.x, self.y, self.radius, self.color)
+        pyxel.circb (self.x, self.y, self.radius, self.color)
+        if self.color == 0 :
+            x = self.x -15.5
+            y = self.y -16
+            pyxel.blt(x,y,0,16 , 72 , 32, 32 , 5)
+        else :
+            pyxel.circ (self.x, self.y, self.radius, self.color)
 
 def update(): #função que atualiza o circulo durante o jogo
-    if pyxel.btnp(pyxel.KEY_Q):
-        pyxel.quit()
+    if pyxel.btnp(pyxel.MOUSE_LEFT_BUTTON):
+        for circ in circ_list:
+            circ.clic() 
     for circ in circ_list.copy():
         circ.life -= 1
         if circ.life <= 0:
             i = circ_list.index(circ)
             del circ_list[i]
         else :
-            circ.fall()
-    
+            circ.fall() 
 
-    # Cria um fruta novo a cada x frames e adiciona na lista
-    if pyxel.frame_count % 8 == 0 and len(circ_list) < 100:
+    # Cria um circulo novo a cada x frames e adiciona na lista
+    if pyxel.frame_count % 16 == 0 and len(circ_list) < 100:
         circ = random_circ()
         circ_list.append(circ)
 
@@ -79,11 +86,11 @@ def random_circ(): #função que cria varios circulos
     global radius
     color = random.choice(cores)
     x = random.uniform(0, 160)
-    y = random.uniform(120, 120)
-    radius = random.uniform(7, 10)
-    vx = random.uniform(-2,2)
-    vy = random.uniform ( -4.2 ,  -3)
-    return Fruta(x, y,radius = radius ,vx = vx , vy = vy,color= color , life=110)
+    y = 120
+    radius = random.uniform(10,10)
+    vx = random.uniform(-2 , 2)
+    vy = random.uniform ( -4.2 ,-3)
+    return Fruta(x, y,radius = radius ,vx = vx , vy = vy,color = color , life= 110)
 
 
 def draw(): # desenha mapa e circulos
@@ -91,6 +98,19 @@ def draw(): # desenha mapa e circulos
     pyxel.bltm(15, 0, 0, 0, 0, 20, 16, pyxel.COLOR_CYAN)
     for circ in circ_list:
         circ.draw()
+    if lose == True:
+        game_over()
+        
+def game_over():
+    pyxel.cls(5)
+    pyxel.bltm(15, 0, 0, 0, 0, 20, 16, pyxel.COLOR_CYAN)
+    pyxel.text(55,65 ," GAME OVER ", pyxel.COLOR_ORANGE)
+    pyxel.rect(55, 75 , 40 , 10, pyxel.frame_count / 3 % 16 )
+    pyxel.text(57 ,78 , "REINICIAR", pyxel.COLOR_BLACK)
+    pyxel.text(58 ,77 , "REINICIAR", pyxel.COLOR_WHITE)
+
+
+
 
 pyxel.init(160, 124, caption="Fruit Ninja", fps=30)
 circ_list = [random_circ()]
