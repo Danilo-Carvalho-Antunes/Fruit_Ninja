@@ -6,6 +6,7 @@ gravity = 5 / 60 #gravidade com que o circulo cai
 lose = False
 score = 0 
 ativo = False
+
 cores = [
     0,
     0,
@@ -26,10 +27,8 @@ cores = [
     14,
     15,
 ]
-
-
 class Fruta:
-    def _init_(
+    def __init__(
         self, x, y, radius, vx , vy, color, life= float("inf")
     ):
         self.x = x #posição em x 
@@ -44,14 +43,15 @@ class Fruta:
         global lose , score
         dx = pyxel.mouse_x - self.x
         dy = pyxel.mouse_y - self.y
-        if sqrt(dx * 2 + dy * 2) < self.radius:
+        if sqrt(dx ** 2 + dy ** 2) < self.radius:
             self.life = 0
             if self.color == 0:
                 lose = True
             else:
                 score += 1
-        
-            
+
+
+
     def fall(self): #função que faz a bolinha cair
         self.x += self.vx 
         self.y += self.vy 
@@ -67,6 +67,7 @@ class Fruta:
             pyxel.circ (self.x, self.y, self.radius, self.color)
 
 def update(): #função que atualiza o circulo durante o jogo
+    #função que atualiza o circulo durante o jogo
     global ativo
 
     #Sair com Q ou Esc
@@ -100,10 +101,10 @@ def restart():
     pyxel.text(55,65 ," PRESSIONE S ", pyxel.COLOR_YELLOW)
     pyxel.rect(55, 75 , 50 , 10, pyxel.frame_count / 3 % 16 )
     pyxel.text(69 ,78 , "START", pyxel.COLOR_DARKBLUE)
-    pyxel.text(70 ,77 , "START", pyxel.COLOR_BLACK)  
+    pyxel.text(70 ,77 , "START", pyxel.COLOR_BLACK) 
 
-
-def update_game(): #Atualiza as variáveis em cada frame do jogo
+def update_game () :
+    #Atualiza as variáveis em cada frame do jogo
     global ativo
     # Atualiza o Circulo
     if pyxel.btnp(pyxel.MOUSE_LEFT_BUTTON):
@@ -124,6 +125,7 @@ def update_game(): #Atualiza as variáveis em cada frame do jogo
         circ_list.append(circ)
         ativo = True
 
+
 def random_circ(): #função que cria varios circulos
     global radius
     color = random.choice(cores)
@@ -132,7 +134,8 @@ def random_circ(): #função que cria varios circulos
     radius = random.uniform(10,10)
     vx = random.uniform(-2 , 2)
     vy = random.uniform ( -4.2 ,-3)
-    return Fruta(x, y, radius = radius ,vx = vx , vy = vy,color = color , life= 110)
+    return Fruta(x, y,radius = radius ,vx = vx , vy = vy,color = color , life= 110)
+
 
 def draw(): # desenha mapa e circulos
     pyxel.cls(5)
@@ -149,19 +152,18 @@ def draw(): # desenha mapa e circulos
     pyxel.text(86 , 26 ,str(score),7)
     if lose == True:
         game_over()
-    
-        
+
+
 def game_over():
     pyxel.cls(5)
     pyxel.bltm(15, 0, 0, 0, 0, 20, 16, pyxel.COLOR_CYAN)
     pyxel.text(55,65 ," GAME OVER ", pyxel.COLOR_ORANGE)
-    pyxel.rect(55, 75 , 40 , 10, pyxel.frame_count / 3 % 16 )
-    pyxel.text(57 ,78 , "REINICIAR", pyxel.COLOR_BLACK)
-    pyxel.text(58 ,77 , "REINICIAR", pyxel.COLOR_WHITE)
-    pyxel.text(58,85, "Aperte R", pyxel.COLOR_RED)
+    pyxel.rect(56, 75 , 40 , 10, pyxel.frame_count / 3 % 16 )
+    pyxel.text(58 ,78 , "REINICIAR", pyxel.COLOR_BLACK)
+    pyxel.text(59 ,77 , "REINICIAR", pyxel.COLOR_WHITE)
+    pyxel.text(60,87, "APERTE R", pyxel.COLOR_BLACK)
     pyxel.text (63 , 26 , "SCORE:" ,1)
     pyxel.text(86 , 26 ,str(score),7)
-
 
 pyxel.init(160, 124, caption="Fruit Ninja", fps=30)
 circ_list = [random_circ()]
