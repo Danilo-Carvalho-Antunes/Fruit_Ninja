@@ -5,7 +5,7 @@ from math import sqrt
 gravity = 5 / 60 #gravidade com que o circulo cai 
 lose = False
 score = 0 
-
+ativo = False
 cores = [
     0,
     0,
@@ -29,7 +29,7 @@ cores = [
 
 
 class Fruta:
-    def __init__(
+    def _init_(
         self, x, y, radius, vx , vy, color, life= float("inf")
     ):
         self.x = x #posição em x 
@@ -44,15 +44,14 @@ class Fruta:
         global lose , score
         dx = pyxel.mouse_x - self.x
         dy = pyxel.mouse_y - self.y
-        if sqrt(dx ** 2 + dy ** 2) < self.radius:
+        if sqrt(dx * 2 + dy * 2) < self.radius:
             self.life = 0
             if self.color == 0:
                 lose = True
             else:
                 score += 1
         
-                
-
+            
     def fall(self): #função que faz a bolinha cair
         self.x += self.vx 
         self.y += self.vy 
@@ -68,9 +67,50 @@ class Fruta:
             pyxel.circ (self.x, self.y, self.radius, self.color)
 
 def update(): #função que atualiza o circulo durante o jogo
+    global ativo
+
+    #Sair com Q ou Esc
+    if pyxel.btnp(pyxel.KEY_Q):
+        pyxel.quit
+
+    #Reinciar com R
+    elif ativo and pyxel.btnp(pyxel.KEY_R) and lose == True:
+        restart()
+        
+    #Roda o jogo
+    elif ativo:
+        update_game()    
+    
+    #Inicia o jogo
+    elif pyxel.btnp(pyxel.KEY_S):
+        ativo = True
+
+def restart():
+    """
+    Reinicia as variáveis de estado que controlam o jogo.
+    """
+    global ativo, lose, score, circ, circ_list
+    
+    circ_list.clear() #Limpa as frutas que estavam na tela
+    ativo = False
+    lose = False
+    score = 0
+    pyxel.cls(5)
+    pyxel.bltm(15, 0, 0, 0, 0, 20, 16, pyxel.COLOR_CYAN)
+    pyxel.text(55,65 ," PRESSIONE S ", pyxel.COLOR_YELLOW)
+    pyxel.rect(55, 75 , 50 , 10, pyxel.frame_count / 3 % 16 )
+    pyxel.text(69 ,78 , "START", pyxel.COLOR_DARKBLUE)
+    pyxel.text(70 ,77 , "START", pyxel.COLOR_BLACK)  
+
+
+def update_game(): #Atualiza as variáveis em cada frame do jogo
+    global ativo
+    # Atualiza o Circulo
     if pyxel.btnp(pyxel.MOUSE_LEFT_BUTTON):
         for circ in circ_list:
             circ.clic() 
+        ativo = True  
+        
     for circ in circ_list.copy():
         circ.life -= 1
         if circ.life <= 0:
@@ -78,27 +118,31 @@ def update(): #função que atualiza o circulo durante o jogo
             del circ_list[i]
         else :
             circ.fall() 
-    
-
     # Cria um circulo novo a cada x frames e adiciona na lista
     if pyxel.frame_count % 16 == 0 and len(circ_list) < 100:
         circ = random_circ()
         circ_list.append(circ)
+        ativo = True
 
 def random_circ(): #função que cria varios circulos
     global radius
     color = random.choice(cores)
     x = random.uniform(0, 160)
-    y = 120
+    y = 134
     radius = random.uniform(10,10)
     vx = random.uniform(-2 , 2)
     vy = random.uniform ( -4.2 ,-3)
-    return Fruta(x, y,radius = radius ,vx = vx , vy = vy,color = color , life= 110)
-
+    return Fruta(x, y, radius = radius ,vx = vx , vy = vy,color = color , life= 110)
 
 def draw(): # desenha mapa e circulos
     pyxel.cls(5)
     pyxel.bltm(15, 0, 0, 0, 0, 20, 16, pyxel.COLOR_CYAN)
+    if ativo == False:
+        pyxel.bltm(15, 0, 0, 0, 0, 20, 16, pyxel.COLOR_CYAN)
+        pyxel.text(55,65 ," PRESSIONE S ", pyxel.COLOR_YELLOW)
+        pyxel.rect(55, 75 , 50 , 10, pyxel.frame_count / 3 % 16 )
+        pyxel.text(69 ,78 , "START", pyxel.COLOR_DARKBLUE)
+        pyxel.text(70 ,77 , "START", pyxel.COLOR_BLACK)  
     for circ in circ_list:
         circ.draw()
     pyxel.text (63 , 26 , "SCORE:" ,1)
@@ -114,8 +158,9 @@ def game_over():
     pyxel.rect(55, 75 , 40 , 10, pyxel.frame_count / 3 % 16 )
     pyxel.text(57 ,78 , "REINICIAR", pyxel.COLOR_BLACK)
     pyxel.text(58 ,77 , "REINICIAR", pyxel.COLOR_WHITE)
-
-
+    pyxel.text(58,85, "Aperte R", pyxel.COLOR_RED)
+    pyxel.text (63 , 26 , "SCORE:" ,1)
+    pyxel.text(86 , 26 ,str(score),7)
 
 
 pyxel.init(160, 124, caption="Fruit Ninja", fps=30)
