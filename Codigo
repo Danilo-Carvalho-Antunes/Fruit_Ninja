@@ -3,10 +3,11 @@ import random
 from math import sqrt
 
 gravity = 5 / 60 #gravidade com que o circulo cai 
-lose = False
-score = 0 
-ativo = False
+lose = False #variavel de game over
+score = 0 # variavel de placar
+ativo = False #varieval que roda o jogo
 
+#lista de cores do pyxel
 cores = [
     0,
     0,
@@ -72,7 +73,7 @@ def update(): #função que atualiza o circulo durante o jogo
 
     #Sair com Q ou Esc
     if pyxel.btnp(pyxel.KEY_Q):
-        pyxel.quit
+        pyxel.quit()
 
     #Reinciar com R
     elif ativo and pyxel.btnp(pyxel.KEY_R) and lose == True:
@@ -112,6 +113,7 @@ def update_game () :
             circ.clic() 
         ativo = True  
         
+    #deminui a vida dos circulos e faz eles cairem na tela
     for circ in circ_list.copy():
         circ.life -= 1
         if circ.life <= 0:
@@ -119,6 +121,7 @@ def update_game () :
             del circ_list[i]
         else :
             circ.fall() 
+            
     # Cria um circulo novo a cada x frames e adiciona na lista
     if pyxel.frame_count % 16 == 0 and len(circ_list) < 100:
         circ = random_circ()
